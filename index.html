@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="叫貨">
+<meta name="theme-color" content="#c4520c">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>早餐店叫貨</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap">
+<style>
+/* Layout: one column, phone-first, huge type and thumb-sized buttons; sticky bottom action bar */
+:root{
+  --bg:#fdf3e4; --card:#ffffff; --ink:#2a1d12; --muted:#6b5543; --line:#ecd6bb;
+  --accent:#c4520c; --accent-ink:#ffffff; --yolk:#f5a623; --yolk-soft:#ffe9c2;
+  --linegreen:#06a74a; --phone:#1f5f8b; --danger:#b3261e; --tagink:#ffffff;
+  --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1a130d; --card:#271c13; --ink:#fbf1e4; --muted:#d3bba2; --line:#4a3725;
+  --accent:#ff9d4a; --accent-ink:#2a1405; --yolk:#f5b54a; --yolk-soft:#3d2a12;
+  --linegreen:#3ccf78; --phone:#6fb3e3; --danger:#ff8a80; --tagink:#111111; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1a130d; --card:#271c13; --ink:#fbf1e4; --muted:#d3bba2; --line:#4a3725;
+  --accent:#ff9d4a; --accent-ink:#2a1405; --yolk:#f5b54a; --yolk-soft:#3d2a12;
+  --linegreen:#3ccf78; --phone:#6fb3e3; --danger:#ff8a80; --tagink:#111111; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:22px;line-height:1.45;font-weight:500}
+.wrap{max-width:640px;margin:0 auto;padding-block:16px 140px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:34px;font-weight:900;margin:8px 0 4px;text-wrap:balance}
+h2{font-size:28px;font-weight:900;margin:0;text-wrap:balance}
+.sub{color:var(--muted);font-size:20px;margin:0 0 18px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;border-radius:16px}
+button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:4px solid var(--yolk);outline-offset:2px}
+.stack{display:flex;flex-direction:column;gap:14px}
+
+.vendor{display:flex;align-items:center;gap:16px;width:100%;text-align:left;background:var(--card);
+  border:2px solid var(--line);padding:22px 20px;min-height:110px}
+.vendor .nm{font-size:34px;font-weight:900;flex:1;min-width:0}
+.tag{display:inline-flex;align-items:center;font-size:20px;font-weight:700;padding:6px 14px;border-radius:999px;color:var(--tagink);white-space:nowrap}
+.tag.line{background:var(--linegreen)} .tag.phone{background:var(--phone)}
+.pending{display:block;font-size:19px;color:var(--muted);font-weight:500;margin-top:2px}
+.pending b{color:var(--ink)}
+
+.top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.back{background:var(--card);border:2px solid var(--line);padding:10px 18px;font-size:22px;font-weight:700;min-height:56px}
+.top h2{flex:1;min-width:0}
+
+.row{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:10px 10px 10px 18px}
+.row.on{border-color:var(--yolk);background:var(--yolk-soft)}
+.row .name{flex:1;min-width:0;font-size:28px;font-weight:700;word-break:break-all}
+.row .unit{font-size:18px;color:var(--muted);font-weight:500}
+.qty{display:flex;align-items:center;gap:6px}
+.qbtn{width:60px;height:60px;font-size:36px;font-weight:900;line-height:1;background:var(--bg);border:2px solid var(--line);color:var(--ink)}
+.qbtn.plus{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.qnum{width:64px;height:60px;text-align:center;font-size:32px;font-weight:900;border:2px solid var(--line);border-radius:12px;background:var(--card);font-variant-numeric:tabular-nums}
+@media (max-width:420px){.row{flex-wrap:wrap}.row .name{flex-basis:100%}.qty{margin-left:auto}}
+
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:64px;padding:12px 20px;font-size:24px;font-weight:700;text-decoration:none;border-radius:16px;text-align:center}
+.btn.main{background:var(--accent);color:var(--accent-ink)}
+.btn.soft{background:var(--card);border:2px solid var(--line);color:var(--ink)}
+.btn.line{background:var(--linegreen);color:var(--tagink)}
+.btn.phone{background:var(--phone);color:var(--tagink)}
+.btn.danger{background:transparent;border:2px solid var(--danger);color:var(--danger)}
+.btn.wide{width:100%}
+.btn.grow{flex:1}
+.btn[disabled]{opacity:.45;cursor:default}
+
+textarea,input.txt{width:100%;border:2px solid var(--line);border-radius:14px;padding:14px;background:var(--card);font-size:24px}
+textarea{min-height:110px;resize:vertical}
+.lb{font-size:20px;color:var(--muted);font-weight:700;display:block;margin:18px 0 6px}
+
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:2px solid var(--line);
+  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.bar .in{max-width:640px;margin:0 auto;display:flex;gap:10px}
+
+.msg{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:18px 20px;font-size:30px;font-weight:700;white-space:pre-wrap;line-height:1.55;word-break:break-all}
+.step{display:flex;gap:12px;align-items:center;font-size:22px;color:var(--muted);font-weight:700;margin:22px 0 8px}
+.step .n{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--yolk);color:#1b1f1d;font-weight:900;flex:none}
+.phonebig{font-size:40px;font-weight:900;letter-spacing:1px;font-variant-numeric:tabular-nums;user-select:all;margin-bottom:10px}
+.checkrow{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--card);border:2px solid var(--line);border-radius:14px;font-size:30px;font-weight:700;width:100%;text-align:left}
+.checkrow .box{width:40px;height:40px;border:3px solid var(--muted);border-radius:8px;flex:none;display:grid;place-items:center;font-size:28px}
+.checkrow.done{opacity:.45;text-decoration:line-through}
+.checkrow.done .box{background:var(--linegreen);border-color:var(--linegreen);color:var(--tagink)}
+.toast{position:fixed;left:50%;top:calc(20px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:14px 24px;border-radius:14px;font-size:24px;font-weight:700;z-index:20;max-width:90vw;text-align:center}
+
+.erow{display:flex;gap:8px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px}
+.erow input{min-width:0;border:2px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);font-size:22px}
+.erow .en{flex:1}
+.erow .eu{width:76px}
+.ib{width:52px;height:52px;flex:none;font-size:24px;background:var(--bg);border:2px solid var(--line);border-radius:12px;color:var(--ink)}
+.ib.del{color:var(--danger)}
+.seg{display:flex;gap:10px}
+.seg button{flex:1;min-height:60px;border:2px solid var(--line);background:var(--card);font-size:22px;font-weight:700}
+.seg button.sel{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.hint{font-size:19px;color:var(--muted)}
+.confirm{background:var(--yolk-soft);border:2px solid var(--yolk);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.gear{margin-top:28px}
+@media (prefers-reduced-motion: no-preference){.btn,.qbtn,.vendor{transition:transform .08s}.btn:active,.qbtn:active,.vendor:active{transform:scale(.97)}}
+</style>
+
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="bar" id="bar" hidden><div class="in" id="barIn"></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const KEY = 'mama-order-v1';
+const DEFAULT = {
+  vendors: [
+    { id:'v1', name:'唯樂', type:'line', phone:'',
+      items: [
+        ['漢堡肉',''],['豬排',''],['香雞',''],['沙拉','盒'],['大火腿',''],['小火腿',''],
+        ['辣卡拉',''],['脆薯','包'],['雞柳',''],['花枝',''],['宮保',''],['三杯',''],
+        ['油面',''],['意大利肉醬',''],['黑胡椒醬',''],['意大利面條',''],['白醬',''],
+        ['烏龍麵',''],['9 0 8 7 ～','盒'],['蔥仔','包']
+      ].map(([name,unit])=>({name,unit})),
+      last: {'漢堡肉':5,'豬排':5,'香雞':1,'沙拉':1,'大火腿':1,'小火腿':1,'辣卡拉':1,'脆薯':1,'雞柳':1,'花枝':1,
+        '宮保':10,'三杯':10,'油面':20,'意大利肉醬':20,'黑胡椒醬':20,'意大利面條':40,'白醬':10,'烏龍麵':10,'9 0 8 7 ～':4,'蔥仔':2}
+    },
+    { id:'v2', name:'立翔', type:'phone', phone:'', items:[], last:{} },
+    { id:'v3', name:'餐具', type:'line', phone:'', items:[], last:{} }
+  ],
+  cart: {}
+};
+
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY)) } catch(e) {}
+if (!S || !Array.isArray(S.vendors)) S = JSON.parse(JSON.stringify(DEFAULT));
+S.cart = S.cart || {};
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)) }catch(e){} }
+
+let view = { page:'home' };
+let checked = {};
+let confirmDel = false;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const V = id => S.vendors.find(v => v.id === id);
+const cartOf = v => (S.cart[v.id] = S.cart[v.id] || {});
+const noteKey = v => v.id + '__note';
+
+function orderLines(v){
+  const c = cartOf(v), out = [];
+  v.items.forEach(it => { const q = c[it.name]|0; if (q>0) out.push(it.name + q + (it.unit||'')) });
+  const note = (S.cart[noteKey(v)]||'').trim();
+  if (note) note.split('\n').map(s=>s.trim()).filter(Boolean).forEach(s=>out.push(s));
+  return out;
+}
+function message(v){ const l = orderLines(v); return l.length ? l.join('\n') + '\n謝謝！' : '' }
+function countOf(v){ return orderLines(v).length }
+
+function toast(t){ const el=$('#toast'); el.textContent=t; el.hidden=false; clearTimeout(toast.t); toast.t=setTimeout(()=>el.hidden=true,2400) }
+function go(p){
+  if (view.page==='edit'){ const v=V(view.id); if(v){ v.items=v.items.filter(it=>it.name.trim()); save() } }
+  view = p; confirmDel=false; render(); window.scrollTo(0,0);
+}
+
+function home(){
+  return `<h1>今天要叫什麼貨？</h1><p class="sub">按廠商名字開始</p>
+  <div class="stack">${S.vendors.map(v=>{
+    const n = countOf(v);
+    return `<button class="vendor" data-act="open" data-id="${v.id}">
+      <span class="nm">${esc(v.name)}${n?`<span class="pending">還沒送出：<b>${n} 樣</b></span>`:''}</span>
+      <span class="tag ${v.type}">${v.type==='line'?'LINE':'電話'}</span></button>`}).join('')}
+  </div>
+  <button class="btn soft wide gear" data-act="addVendor">＋ 新增廠商</button>`;
+}
+
+function order(v){
+  const c = cartOf(v), hasLast = Object.keys(v.last||{}).length;
+  return `<div class="top"><button class="back" data-act="home">← 回去</button><h2>${esc(v.name)}</h2>
+    <span class="tag ${v.type}">${v.type==='line'?'LINE':'電話'}</span></div>
+  <div class="tools">
+    ${hasLast?`<button class="btn soft grow" data-act="useLast">照上次叫的</button>`:''}
+    <button class="btn soft grow" data-act="clear">全部清空</button>
+  </div>
+  <div class="stack">
+  ${v.items.length? v.items.map((it,i)=>{const q=c[it.name]|0; return `
+    <div class="row ${q?'on':''}">
+      <div class="name">${esc(it.name)}${it.unit?` <span class="unit">（${esc(it.unit)}）</span>`:''}</div>
+      <div class="qty">
+        <button class="qbtn" data-act="minus" data-i="${i}" aria-label="${esc(it.name)} 減一">−</button>
+        <input class="qnum" id="q${v.id}_${i}" inputmode="numeric" data-i="${i}" value="${q||''}" placeholder="0" aria-label="${esc(it.name)} 數量">
+        <button class="qbtn plus" data-act="plus" data-i="${i}" aria-label="${esc(it.name)} 加一">＋</button>
+      </div></div>`}).join('')
+  : `<p class="hint">這家還沒有品項。按下面「改品項」加進來，或直接寫在「其他要叫的」。</p>`}
+  </div>
+  <label class="lb" for="note${v.id}">其他要叫的（直接打字，一行一樣）</label>
+  <textarea id="note${v.id}" data-act="note" placeholder="例如：吸管2包">${esc(S.cart[noteKey(v)]||'')}</textarea>
+  <button class="btn soft wide gear" data-act="edit">✎ 改品項／電話</button>`;
+}
+
+function send(v){
+  const msg = message(v), lines = orderLines(v);
+  const head = `<div class="top"><button class="back" data-act="back">← 回去改</button><h2>${esc(v.name)}</h2></div>`;
+  if (!msg) return head + `<p>還沒選任何東西喔。</p>`;
+  if (v.type==='line') return head + `
+    <div class="step"><span class="n">1</span>看一下對不對</div>
+    <div class="msg" id="msgbox">${esc(msg)}</div>
+    <div class="step"><span class="n">2</span>傳到 LINE</div>
+    <div class="stack">
+      <a class="btn line wide" href="https://line.me/R/msg/text/?${encodeURIComponent(msg)}" target="_blank" rel="noopener">打開 LINE 傳給${esc(v.name)}</a>
+      <button class="btn soft wide" data-act="copy">複製訊息（自己貼到 LINE）</button>
+    </div>
+    <p class="hint">打開 LINE 後，選「${esc(v.name)}」再按傳送。如果沒跳到 LINE，就按「複製訊息」，到 LINE 對話框長按、貼上。</p>
+    <div class="step"><span class="n">3</span>傳好了嗎？</div>
+    <button class="btn main wide" data-act="done">傳好了，記下來</button>`;
+  return head + `
+    <div class="step"><span class="n">1</span>打電話給${esc(v.name)}</div>
+    ${v.phone?`<div class="phonebig">${esc(v.phone)}</div>
+      <a class="btn phone wide" href="tel:${esc(v.phone.replace(/[^\d+]/g,''))}">撥打電話</a>`
+      :`<p class="hint">還沒存電話號碼。按「← 回去改」，再按「改品項／電話」加上去。</p>`}
+    <div class="step"><span class="n">2</span>照著念，念完一樣按一下</div>
+    <div class="stack">${lines.map((l,i)=>`<button class="checkrow ${checked[i]?'done':''}" data-act="tick" data-i="${i}"><span class="box">${checked[i]?'✓':''}</span>${esc(l)}</button>`).join('')}</div>
+    <div class="step"><span class="n">3</span>講完了嗎？</div>
+    <button class="btn main wide" data-act="done">講好了，記下來</button>`;
+}
+
+function edit(v){
+  return `<div class="top"><button class="back" data-act="back">← 好了</button><h2>改 ${esc(v.name)}</h2></div>
+  <label class="lb" for="vname">廠商名字</label>
+  <input class="txt" id="vname" data-f="name" value="${esc(v.name)}">
+  <span class="lb">怎麼叫貨</span>
+  <div class="seg"><button data-act="type" data-t="line" class="${v.type==='line'?'sel':''}">LINE</button>
+    <button data-act="type" data-t="phone" class="${v.type==='phone'?'sel':''}">打電話</button></div>
+  <label class="lb" for="vphone">電話號碼</label>
+  <input class="txt" id="vphone" data-f="phone" inputmode="tel" value="${esc(v.phone||'')}" placeholder="例如 0912-345-678">
+  <span class="lb">品項（左邊名稱，右邊單位像「包」「盒」，沒有就空著）</span>
+  <div class="stack">${v.items.map((it,i)=>`
+    <div class="erow">
+      <input class="en" id="en${v.id}_${i}" data-i="${i}" data-k="name" value="${esc(it.name)}" aria-label="品名">
+      <input class="eu" id="eu${v.id}_${i}" data-i="${i}" data-k="unit" value="${esc(it.unit||'')}" placeholder="單位" aria-label="單位">
+      <button class="ib" data-act="up" data-i="${i}" aria-label="往上移">↑</button>
+      <button class="ib del" data-act="delItem" data-i="${i}" aria-label="刪掉">✕</button>
+    </div>`).join('')}</div>
+  <button class="btn soft wide" style="margin-top:14px" data-act="addItem">＋ 加一個品項</button>
+  <div style="margin-top:40px">
+  ${confirmDel?`<div class="confirm"><b>確定要刪掉「${esc(v.name)}」這家廠商？</b>
+      <div class="tools" style="margin:0"><button class="btn danger grow" data-act="delVendorYes">確定刪掉</button><button class="btn soft grow" data-act="delVendorNo">不要</button></div></div>`
+    :`<button class="btn danger wide" data-act="delVendor">刪掉這家廠商</button>`}
+  </div>`;
+}
+
+function render(){
+  const app = $('#app'), bar = $('#bar'), barIn = $('#barIn');
+  const v = view.id && V(view.id);
+  bar.hidden = true;
+  if (view.page==='home' || !v){ view={page:'home'}; app.innerHTML = home(); return }
+  if (view.page==='order'){
+    app.innerHTML = order(v);
+    bar.hidden = false;
+    barIn.innerHTML = `<button class="btn main grow" data-act="toSend"></button>`;
+    updateBar(v); return;
+  }
+  if (view.page==='send'){ app.innerHTML = send(v); return }
+  if (view.page==='edit'){ app.innerHTML = edit(v); return }
+}
+function updateBar(v){
+  const n = countOf(v), b = $('#barIn button'); if (!b) return;
+  b.textContent = n ? `好了，看訂單（${n} 樣）` : '還沒選東西';
+  b.disabled = !n;
+}
+function setQty(v,i,q){
+  q = Math.max(0, Math.min(999, q|0));
+  const it = v.items[i], c = cartOf(v);
+  if (q) c[it.name]=q; else delete c[it.name];
+  save();
+  const inp = document.getElementById(`q${v.id}_${i}`);
+  if (inp){ inp.value = q||''; inp.closest('.row').classList.toggle('on', !!q) }
+  updateBar(v);
+}
+
+document.addEventListener('click', e=>{
+  const b = e.target.closest('[data-act]'); if (!b || b.tagName==='TEXTAREA') return;
+  const act = b.dataset.act, v = view.id && V(view.id), i = +b.dataset.i;
+  switch(act){
+    case 'home': go({page:'home'}); break;
+    case 'open': go({page:'order', id:b.dataset.id}); break;
+    case 'back': go({page:'order', id:v.id}); break;
+    case 'plus': setQty(v,i,(cartOf(v)[v.items[i].name]|0)+1); break;
+    case 'minus': setQty(v,i,(cartOf(v)[v.items[i].name]|0)-1); break;
+    case 'useLast': S.cart[v.id] = Object.assign({}, v.last); save(); render(); toast('帶入上次的數量了'); break;
+    case 'clear': S.cart[v.id] = {}; delete S.cart[noteKey(v)]; save(); render(); toast('清空了'); break;
+    case 'toSend': if (countOf(v)){ checked={}; go({page:'send', id:v.id}) } break;
+    case 'copy': {
+      const msg = message(v);
+      const ok = ()=>toast('複製好了，到 LINE 貼上');
+      const fail = ()=>{ const r=document.createRange(); r.selectNodeContents($('#msgbox')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); toast('字已經選起來，請按「拷貝」') };
+      try { navigator.clipboard.writeText(msg).then(ok, fail) } catch(err){ fail() }
+      break; }
+    case 'tick': checked[i]=!checked[i]; render(); break;
+    case 'done': {
+      v.last = Object.assign({}, cartOf(v));
+      S.cart[v.id] = {}; delete S.cart[noteKey(v)]; save();
+      go({page:'home'}); toast(`${v.name} 叫好了`); break; }
+    case 'edit': go({page:'edit', id:v.id}); break;
+    case 'type': v.type = b.dataset.t; save(); render(); break;
+    case 'addItem': v.items.push({name:'',unit:''}); save(); render();
+      setTimeout(()=>{ const el=document.getElementById(`en${v.id}_${v.items.length-1}`); el&&el.focus() },0); break;
+    case 'delItem': { const it=v.items[i]; v.items.splice(i,1); if(it) delete cartOf(v)[it.name]; save(); render(); break; }
+    case 'up': if (i>0){ [v.items[i-1],v.items[i]]=[v.items[i],v.items[i-1]]; save(); render() } break;
+    case 'addVendor': { const id='v'+Date.now(); S.vendors.push({id,name:'新廠商',type:'line',phone:'',items:[],last:{}}); save(); go({page:'edit',id}); break; }
+    case 'delVendor': confirmDel=true; render(); break;
+    case 'delVendorNo': confirmDel=false; render(); break;
+    case 'delVendorYes': S.vendors = S.vendors.filter(x=>x!==v); delete S.cart[v.id]; delete S.cart[noteKey(v)]; save(); view={page:'home'}; render(); break;
+  }
+});
+
+document.addEventListener('input', e=>{
+  const t = e.target, v = view.id && V(view.id); if (!v) return;
+  if (t.classList.contains('qnum')){ const i=+t.dataset.i, it=v.items[i], q=parseInt(t.value.replace(/\D/g,''))||0;
+    const c=cartOf(v); if(q) c[it.name]=q; else delete c[it.name]; t.closest('.row').classList.toggle('on',!!q); save(); updateBar(v); }
+  else if (t.dataset.act==='note'){ S.cart[noteKey(v)] = t.value; save(); updateBar(v) }
+  else if (t.dataset.f){ v[t.dataset.f] = t.value; save() }
+  else if (t.dataset.k){ const it=v.items[+t.dataset.i], c=cartOf(v);
+    if (t.dataset.k==='name' && c[it.name]!=null){ c[t.value]=c[it.name]; delete c[it.name] }
+    if (t.dataset.k==='name' && v.last && v.last[it.name]!=null){ v.last[t.value]=v.last[it.name]; delete v.last[it.name] }
+    it[t.dataset.k] = t.value; save() }
+});
+document.addEventListener('focusin', e=>{ if (e.target.classList.contains('qnum')) e.target.select() });
+
+render();
+</script>
+</body>
+</html>
